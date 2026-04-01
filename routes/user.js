@@ -1,8 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const userRouter = express.Router();
-const { UserModel } = require("../db.js")
+const { UserModel, TodoModel } = require("../db.js")
 const jwt = require("jsonwebtoken");
+const { userMiddleware } = require("../Middleware/authMiddleware.js")
 
 userRouter.post("/signup", async (req, res) => {
     const email = req.body.email;
@@ -83,14 +84,46 @@ userRouter.post("/signin", async (req, res) => {
 
 
 
-userRouter.post("/todo", (req, res) => {
+//authenticated endpoint
+userRouter.post("/todo", userMiddleware, async (req, res) => {
+    const userId = req.userId;
+    const { title, status } = req.body;
+    try {
+        await TodoModel.create({
+            userId,
+            title,
+            status
+        })
 
+        res.status(201).json({
+            message: "todo added successfully"
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+        return
+    }
 
 })
 
-userRouter.get("/todos", (req, res) => {
+//authenticated endpoint
+userRouter.get("/todos", userMiddleware, async (req, res) => {
+    const userId = req.userId;
+    try {
+        const todos = await TodoModel.find({
+            userId
+        })
 
-    res.render("signup");
+        res.status(200).json({
+            todos
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "internal server error"
+        })
+        return
+    }
 
 })
 
