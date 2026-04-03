@@ -2,15 +2,13 @@ const jwt = require("jsonwebtoken");
 
 function userMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.json({
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(403).json({
             message: "you are not logged in"
-        })
+        });
     }
 
-    const token = authHeader.startsWith("Bearer ") 
-        ? authHeader.slice(7) 
-        : authHeader;
+    const token = authHeader.split(" ")[1];
 
     const decodedData = jwt.verify(token, process.env.JWT_USER_PASSWORD)
 
