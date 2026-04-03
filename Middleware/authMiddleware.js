@@ -1,12 +1,16 @@
 const jwt = require("jsonwebtoken");
 
 function userMiddleware(req, res, next) {
-    const token = req.headers.authorization;
-    if (!token) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
         return res.json({
             message: "you are not logged in"
         })
     }
+
+    const token = authHeader.startsWith("Bearer ") 
+        ? authHeader.slice(7) 
+        : authHeader;
 
     const decodedData = jwt.verify(token, process.env.JWT_USER_PASSWORD)
 
