@@ -1,38 +1,168 @@
 # Todo App
 
-A task management application built with modern web technologies.
+A full-stack task management API built with Express, MongoDB, and JWT authentication. Users can create, manage, and track their daily tasks with secure authentication.
 
-## Features
+## Tech Stack
 
-- Create, read, update, and delete tasks
-- User authentication with JWT
-- MongoDB database
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MongoDB with Mongoose
+- **Authentication:** JWT + bcrypt
+- **Validation:** Zod
 
-## Screenshots
+## Project Structure
+
+```
+todo-app/
+├── assets/
+│   ├── api-workflow.png        # API workflow visualization
+│   └── system-design.png       # System design diagram
+├── middleware/
+│   └── authMiddleware.js       # Authentication middleware
+├── routes/
+│   └── user.js                 # User routes
+├── db.js                       # Database models
+├── index.js                    # Entry point
+├── .env                        # Environment variables
+└── package.json
+```
+
+## Database Schema
 
 ![System Design](assets/system-design.png)
 
 ![API Workflow](assets/api-workflow.png)
 
+## API Endpoints
+
+### User Routes (`/api/v1/user`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/signup` | Register a new user | No |
+| POST | `/signin` | Login user | No |
+| GET | `/todos` | Get all user's todo items | Yes |
+| POST | `/todos` | Create a new todo item | Yes |
+| PUT | `/todos/:id` | Update an existing todo item | Yes |
+| DELETE | `/todos/:id` | Delete a todo item | Yes |
+| GET | `/purchases` | Get user's purchased courses | Yes |
+
+### Admin Routes (`/api/v1/admin`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/signup` | Register a new admin | No |
+| POST | `/signin` | Login admin | No |
+| POST | `/course` | Create a new course | Yes |
+| PUT | `/course` | Update an existing course | Yes |
+| DELETE | `/course/:id` | Delete a course | Yes |
+| GET | `/course/bulk` | Get all courses by admin | Yes |
+
+### Course Routes (`/api/v1/course`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/preview` | Get all available courses | No |
+| POST | `/purchase` | Purchase a course | Yes |
+
 ## Getting Started
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+### Prerequisites
 
-2. Configure environment variables:
-   Copy `.env.example` to `.env` and update the values.
+- Node.js (v14+)
+- MongoDB (local or Atlas)
 
-3. Start the server:
-   ```bash
-   npm start
-   ```
+### Installation
 
-## Environment Variables
+```bash
+# Clone the repository
+git clone <repo-url>
+cd todo-app
 
-| Variable | Description |
-|----------|-------------|
-| PORT | Server port number |
-| MONGO_URI | MongoDB connection string |
-| JWT_USER_PASSWORD | JWT secret key |
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your MongoDB URI and JWT secrets
+```
+
+### Environment Variables
+
+```env
+PORT=3345
+MONGO_URI=your_mongodb_uri
+JWT_USER_PASSWORD=your_user_secret_key
+```
+
+### Running the Project
+
+```bash
+# Development mode
+npm run dev
+
+# Production
+npm start
+```
+
+The server will start on `http://localhost:3345`
+
+## Request/Response Examples
+
+### User Signup
+```bash
+POST /api/v1/user/signup
+{
+  "email": "john@example.com",
+  "password": "password123",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+### User Signin
+```bash
+POST /api/v1/user/signin
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+# Response: { "token": "eyJhbGciOiJIUzI1NiIs..." }
+```
+
+### Create Todo (User)
+```bash
+POST /api/v1/user/todos
+Authorization: Bearer <user_token>
+{
+  "title": "Learn Node.js",
+  "description": "Master Node.js from scratch",
+  "completed": false
+}
+```
+
+### Update Todo
+```bash
+PUT /api/v1/user/todos/:id
+Authorization: Bearer <user_token>
+{
+  "title": "Updated Title",
+  "completed": true
+}
+```
+
+### Delete Todo
+```bash
+DELETE /api/v1/user/todos/:id
+Authorization: Bearer <user_token>
+```
+
+### Get All Todos
+```bash
+GET /api/v1/user/todos
+Authorization: Bearer <user_token>
+```
+
+## License
+
+ISC
