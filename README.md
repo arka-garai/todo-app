@@ -8,7 +8,6 @@ A full-stack task management API built with Express, MongoDB, and JWT authentica
 - **Framework:** Express.js
 - **Database:** MongoDB with Mongoose
 - **Authentication:** JWT + bcrypt
-- **Validation:** Zod
 
 ## Project Structure
 
@@ -23,7 +22,6 @@ todo-app/
 │   └── user.js                 # User routes
 ├── db.js                       # Database models
 ├── index.js                    # Entry point
-├── .env                        # Environment variables
 └── package.json
 ```
 
@@ -41,29 +39,10 @@ todo-app/
 |--------|----------|-------------|---------------|
 | POST | `/signup` | Register a new user | No |
 | POST | `/signin` | Login user | No |
-| GET | `/todos` | Get all user's todo items | Yes |
+| GET | `/todos` | Get all todo items | Yes |
 | POST | `/todos` | Create a new todo item | Yes |
 | PUT | `/todos/:id` | Update an existing todo item | Yes |
 | DELETE | `/todos/:id` | Delete a todo item | Yes |
-| GET | `/purchases` | Get user's purchased courses | Yes |
-
-### Admin Routes (`/api/v1/admin`)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/signup` | Register a new admin | No |
-| POST | `/signin` | Login admin | No |
-| POST | `/course` | Create a new course | Yes |
-| PUT | `/course` | Update an existing course | Yes |
-| DELETE | `/course/:id` | Delete a course | Yes |
-| GET | `/course/bulk` | Get all courses by admin | Yes |
-
-### Course Routes (`/api/v1/course`)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/preview` | Get all available courses | No |
-| POST | `/purchase` | Purchase a course | Yes |
 
 ## Getting Started
 
@@ -84,7 +63,6 @@ npm install
 
 # Setup environment variables
 cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secrets
 ```
 
 ### Environment Variables
@@ -92,7 +70,7 @@ cp .env.example .env
 ```env
 PORT=3345
 MONGO_URI=your_mongodb_uri
-JWT_USER_PASSWORD=your_user_secret_key
+JWT_USER_PASSWORD=your_jwt_secret_key
 ```
 
 ### Running the Project
@@ -130,10 +108,10 @@ POST /api/v1/user/signin
 # Response: { "token": "eyJhbGciOiJIUzI1NiIs..." }
 ```
 
-### Create Todo (User)
+### Create Todo
 ```bash
 POST /api/v1/user/todos
-Authorization: Bearer <user_token>
+Authorization: Bearer <token>
 {
   "title": "Learn Node.js",
   "description": "Master Node.js from scratch",
@@ -141,10 +119,16 @@ Authorization: Bearer <user_token>
 }
 ```
 
+### Get All Todos
+```bash
+GET /api/v1/user/todos
+Authorization: Bearer <token>
+```
+
 ### Update Todo
 ```bash
 PUT /api/v1/user/todos/:id
-Authorization: Bearer <user_token>
+Authorization: Bearer <token>
 {
   "title": "Updated Title",
   "completed": true
@@ -154,13 +138,7 @@ Authorization: Bearer <user_token>
 ### Delete Todo
 ```bash
 DELETE /api/v1/user/todos/:id
-Authorization: Bearer <user_token>
-```
-
-### Get All Todos
-```bash
-GET /api/v1/user/todos
-Authorization: Bearer <user_token>
+Authorization: Bearer <token>
 ```
 
 ## License
