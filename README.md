@@ -91,10 +91,9 @@ The server will start on `http://localhost:3345`
 ```bash
 POST /api/v1/user/signup
 {
-  "email": "john@example.com",
-  "password": "password123",
-  "firstName": "John",
-  "lastName": "Doe"
+  "email": "arka@gmail.com",
+  "password": "123123",
+  "username": "sunny"
 }
 ```
 
@@ -102,8 +101,8 @@ POST /api/v1/user/signup
 ```bash
 POST /api/v1/user/signin
 {
-  "email": "john@example.com",
-  "password": "password123"
+  "email": "arka@gmail.com",
+  "password": "123123"
 }
 # Response: { "token": "eyJhbGciOiJIUzI1NiIs..." }
 ```
@@ -113,8 +112,8 @@ POST /api/v1/user/signin
 POST /api/v1/user/todos
 Authorization: Bearer <token>
 {
-  "title": "Learn Node.js",
-  "description": "Master Node.js from scratch",
+  "title": "Go to gym",
+  "description": "Morning workout session",
   "completed": false
 }
 ```
