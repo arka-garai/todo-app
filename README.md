@@ -1,6 +1,6 @@
 # Todo App
 
-A full-stack task management API built with Express, MongoDB, and JWT authentication. Users can create, manage, and track their daily tasks with secure authentication.
+A backend task management API built with Express, MongoDB, and JWT authentication. It provides secure endpoints for user auth and todo management.
 
 ## Tech Stack
 
