@@ -84,7 +84,7 @@ userRouter.post("/signin", async (req, res) => {
 
 
 
-//authenticated endpoint
+//authenticated endpoint to create todo
 userRouter.post("/todo", userMiddleware, async (req, res) => {
     const userId = req.userId;
     const { title, status } = req.body;
@@ -107,7 +107,7 @@ userRouter.post("/todo", userMiddleware, async (req, res) => {
 
 })
 
-//authenticated endpoint
+//authenticated endpoint to get all todos of a user
 userRouter.get("/todos", userMiddleware, async (req, res) => {
     const userId = req.userId;
     try {
@@ -125,6 +125,58 @@ userRouter.get("/todos", userMiddleware, async (req, res) => {
         return
     }
 
+})
+
+//authenticated endpoint to delete todo of a user 
+userRouter.delete("/todo/:id", userMiddleware, async (req, res) => {
+    const userId = req.userId;
+    const todoId = req.params.id;
+
+    try {
+        const deletedTodo = await TodoModel.deleteOne({
+            _id: todoId,
+            userId,
+        });
+        if (deletedTodo.deletedCount === 0) {
+            return res.status(404).json({
+                message: "todo not found"
+            });
+        }
+        res.status(200).json({
+            message: "todo deleted successfully",
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server error",
+        });
+        return
+    }
+});
+
+// authenticated endpoint to update todo of a user
+userRouter.patch("/todo/:id", userMiddleware, async (req, res) => {
+    const userId = req.userId;
+    const todoId = req.params.id;
+    const { title, status } = req.body;
+
+    try {
+        const updatedTodo = await TodoModel.updateOne(
+            { _id: todoId, userId },
+            { title, status });
+        if (updatedTodo.matchedCount === 0) {
+            return res.status(404).json({
+                message: "todo not found"
+            });
+        }
+        res.status(200).json({
+            message: "todo updated successfully",
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server error",
+        });
+        return
+    }
 })
 
 module.exports = {

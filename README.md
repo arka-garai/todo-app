@@ -1,145 +1,223 @@
-# Todo App
+# Todo App API
 
-A backend task management API built with Express, MongoDB, and JWT authentication. It provides secure endpoints for user auth and todo management.
+A simple Express and MongoDB backend for user authentication and personal todo management.
 
 ## Tech Stack
 
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose
-- **Authentication:** JWT + bcrypt
+- Node.js
+- Express.js
+- MongoDB with Mongoose
+- JWT authentication
+- bcrypt for password hashing
 
 ## Project Structure
 
-```
+```text
 todo-app/
-├── assets/
-│   ├── api-workflow.png        # API workflow visualization
-│   └── system-design.png       # System design diagram
-├── middleware/
-│   └── authMiddleware.js       # Authentication middleware
-├── routes/
-│   └── user.js                 # User routes
-├── db.js                       # Database models
-├── index.js                    # Entry point
-└── package.json
+|-- assets/
+|   |-- api-workflow.png
+|   `-- system-design.png
+|-- Middleware/
+|   `-- authMiddleware.js
+|-- routes/
+|   `-- user.js
+|-- db.js
+|-- index.js
+|-- package.json
+`-- README.md
 ```
 
 ## Database Schema
 
-![System Design](assets/system-design.png)
+### User
 
-![API Workflow](assets/api-workflow.png)
+- `email`: String, unique
+- `password`: String
+- `username`: String
 
-## API Endpoints
+### Todo
 
-### User Routes (`/api/v1/user`)
+- `title`: String
+- `status`: Boolean
+- `userId`: ObjectId
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/signup` | Register a new user | No |
-| POST | `/signin` | Login user | No |
-| GET | `/todos` | Get all todo | Yes |
-| POST | `/todo` | Create a new todo | Yes |
-| PUT | `/todo/:id` | Update an existing todo | Yes |
-| DELETE | `/todo/:id` | Delete a todo | Yes |
+## Environment Variables
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v14+)
-- MongoDB (local or Atlas)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <repo-url>
-cd todo-app
-
-# Install dependencies
-npm install
-
-# Setup environment variables
-cp .env.example .env
-```
-
-### Environment Variables
+Create a `.env` file in the project root:
 
 ```env
 PORT=3345
-MONGO_URI=your_mongodb_uri
+MONGODB_URI=your_mongodb_connection_string
 JWT_USER_PASSWORD=your_jwt_secret_key
 ```
 
-### Running the Project
+## Installation
 
 ```bash
-# Development mode
-npm run dev
-
-# Production
-npm start
+npm install
 ```
 
-The server will start on `http://localhost:3345`
+## Run Locally
 
-## Request/Response Examples
-
-### User Signup
 ```bash
-POST /api/v1/user/signup
+npm run dev
+```
+
+The API runs on `http://localhost:3345`.
+
+## Authentication
+
+Protected routes require this header:
+
+```http
+Authorization: Bearer <jwt_token>
+```
+
+## API Endpoints
+
+Base URL: `/api/v1`
+
+| Method | Endpoint    | Description                          | Auth Required |
+| ------ | ----------- | ------------------------------------ | ------------- |
+| POST   | `/signup`   | Register a new user                  | No            |
+| POST   | `/signin`   | Sign in and receive a JWT            | No            |
+| POST   | `/todo`     | Create a todo                        | Yes           |
+| GET    | `/todos`    | Get all todos for the logged-in user | Yes           |
+| PATCH  | `/todo/:id` | Update a todo by id                  | Yes           |
+| DELETE | `/todo/:id` | Delete a todo by id                  | Yes           |
+
+## Request Examples
+
+### Sign Up
+
+```http
+POST /api/v1/signup
+Content-Type: application/json
+
 {
-  "email": "arka@gmail.com",
-  "password": "123123",
+  "email": "user@example.com",
+  "password": "123456",
   "username": "sunny"
 }
 ```
 
-### User Signin
-```bash
-POST /api/v1/user/signin
+Response:
+
+```json
 {
-  "email": "arka@gmail.com",
-  "password": "123123"
+  "message": "signup successfull"
 }
-# Response: { "token": "eyJhbGciOiJIUzI1NiIs..." }
+```
+
+### Sign In
+
+```http
+POST /api/v1/signin
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "123456"
+}
+```
+
+Response:
+
+```json
+{
+  "token": "your_jwt_token",
+  "message": "signin successfull"
+}
 ```
 
 ### Create Todo
-```bash
-POST /api/v1/user/todos
+
+```http
+POST /api/v1/todo
 Authorization: Bearer <token>
+Content-Type: application/json
+
 {
   "title": "Go to gym",
-  "description": "Morning workout session",
-  "completed": false
+  "status": false
 }
 ```
 
-### Get All Todos
-```bash
-GET /api/v1/user/todos
+Response:
+
+```json
+{
+  "message": "todo added successfully"
+}
+```
+
+### Get Todos
+
+```http
+GET /api/v1/todos
 Authorization: Bearer <token>
 ```
 
-### Update Todo
-```bash
-PUT /api/v1/user/todos/:id
-Authorization: Bearer <token>
+Response:
+
+```json
 {
-  "title": "Updated Title",
-  "completed": true
+  "todos": [
+    {
+      "_id": "todo_id",
+      "title": "Go to gym",
+      "status": false,
+      "userId": "user_id",
+      "__v": 0
+    }
+  ]
+}
+```
+
+### Update Todo
+
+```http
+PATCH /api/v1/todo/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Go to gym in the evening",
+  "status": true
+}
+```
+
+Response:
+
+```json
+{
+  "message": "todo updated successfully"
 }
 ```
 
 ### Delete Todo
-```bash
-DELETE /api/v1/user/todos/:id
+
+```http
+DELETE /api/v1/todo/:id
 Authorization: Bearer <token>
 ```
 
-## License
+Response:
 
-ISC
+```json
+{
+  "message": "todo deleted successfully"
+}
+```
+
+## Notes
+
+- Todos are scoped to the authenticated user.
+- If a todo id does not belong to the logged-in user, update and delete return `404`.
+- Duplicate signup attempts return a message indicating the email already exists.
+
+## Diagrams
+
+![System Design](assets/system-design.png)
+
+![API Workflow](assets/api-workflow.png)
